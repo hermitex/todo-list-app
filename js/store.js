@@ -85,25 +85,12 @@
     callback = callback || function () {};
 
     // Generate an ID
-    // var newId = '';
-    // var charset = '0123456789';
+    var newId = '';
+    var charset = '0123456789';
 
-    // for (var i = 0; i < 6; i++) {
-    //   newId += charset.charAt(Math.floor(Math.random() * charset.length));
-    // }
-    // Tibs fix duplicate ids
-    const uuid4 = () => {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-        /[xy]/g,
-        function (c) {
-          let randomNumber = (Math.random() * 16) | 0,
-            v = c == 'X' ? randomNumber : (randomNumber & 0x3) | 0x8;
-          return v.toString(16);
-        }
-      );
-    };
-
-    console.log(uuid4());
+    for (var i = 0; i < 1; i++) {
+      newId += Date.now() + Math.floor(Math.random() * charset);
+    }
 
     // If an ID was actually given, find the item and update each property
     if (id) {
@@ -120,7 +107,7 @@
       callback.call(this, todos);
     } else {
       // Assign an ID
-      updateData.id = uuid4();
+      updateData.id = parseInt(newId);
 
       todos.push(updateData);
       localStorage[this._dbName] = JSON.stringify(data);
