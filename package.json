@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "dependencies": {
+    "todomvc-app-css": "^2.0.1",
+    "todomvc-common": "^1.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "jasmine-core": "^2.0.0"
+  }
+}
