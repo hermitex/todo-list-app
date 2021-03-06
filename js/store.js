@@ -23,8 +23,13 @@
 
       localStorage[name] = JSON.stringify(data);
     }
+    //START EDIT
+    // Using cache property for faster memory accessing
+    // callback.call(this, JSON.parse(localStorage[name]));
 
-    callback.call(this, JSON.parse(localStorage[name]));
+    this._cacheMem = JSON.parse(localStorage[name]);
+    callback.call(this, this._cacheMem);
+    // END EDIT
   }
 
   /**
@@ -45,7 +50,13 @@
       return;
     }
 
-    var todos = JSON.parse(localStorage[this._dbName]).todos;
+    // START EDIT
+    // EDIT: Fetch todos from cache memory(_cacheMem)
+    // var todos = JSON.parse(localStorage[this._dbName]).todos;
+
+    var todos = this._cacheMem.todos;
+
+    // END EDIT
 
     callback.call(
       this,
@@ -67,7 +78,14 @@
    */
   Store.prototype.findAll = function (callback) {
     callback = callback || function () {};
-    callback.call(this, JSON.parse(localStorage[this._dbName]).todos);
+
+    // START EDIT
+    // EDIT: Retrieve todos from cache memory instead of localstorage
+    // callback.call(this, JSON.parse(localStorage[this._dbName]).todos);
+
+    callback.call(this, this._cacheMem.todos);
+
+    // END EDIT
   };
 
   /**
@@ -79,18 +97,28 @@
    * @param {number} id An optional param to enter an ID of an item to update
    */
   Store.prototype.save = function (updateData, callback, id) {
-    var data = JSON.parse(localStorage[this._dbName]);
+    // START EDIT
+    // EDIT: Retrieve todos from cache memory instead of localstorage
+    // var data = JSON.parse(localStorage[this._dbName]);
+
+    var data = this._cacheMem;
+
+    // END EDIT
     var todos = data.todos;
 
     callback = callback || function () {};
 
-    // Generate an ID
-    var newId = '';
-    var charset = '0123456789';
+    // START EDIT
+    // EDIT: Avoid generating unnecessary IDs by moving
+    // by moving this code to an else block
 
-    for (var i = 0; i < 1; i++) {
-      newId += Date.now() + Math.floor(Math.random() * charset);
-    }
+    // Generate an ID
+    // var newId = '';
+    // var charset = '0123456789';
+
+    // for (var i = 0; i < 1; i++) {
+    //   newId += charset.charAt(Math.floor(Math.random() * charset.length));
+    // }
 
     // If an ID was actually given, find the item and update each property
     if (id) {
@@ -103,16 +131,41 @@
         }
       }
 
-      localStorage[this._dbName] = JSON.stringify(data);
+      // START EDIT
+      // EDIT: This code will run in duplicates
+      // since it runs in both situtions.
+      // Move to to after the if/else block
+      // localStorage[this._dbName] = JSON.stringify(data);
+      // END EDIT
       callback.call(this, todos);
     } else {
+      // START EDIT
+      // EDIT: Let us use a timestamp to generate the ID.
+      // This could be more unique
       // Assign an ID
+      // Generate an ID
+      var newId = '';
+      var charset = '0123456789';
+
+      for (var i = 0; i < 6; i++) {
+        newId += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+
+      // END EDIT
+
       updateData.id = parseInt(newId);
 
       todos.push(updateData);
-      localStorage[this._dbName] = JSON.stringify(data);
+
+      // START EDIT
+      // EDIT: This code will run in duplicates
+      // move to after if/else block
+      // localStorage[this._dbName] = JSON.stringify(data);
+
+      // END EDIT
       callback.call(this, [updateData]);
     }
+    localStorage[this._dbName] = JSON.stringify(data);
   };
 
   /**
@@ -122,21 +175,43 @@
    * @param {function} callback The callback to fire after saving
    */
   Store.prototype.remove = function (id, callback) {
-    var data = JSON.parse(localStorage[this._dbName]);
+    // START EDIT
+    // EDIT: Fetch from cache memory instead of localstorage
+    // var data = JSON.parse(localStorage[this._dbName]);
+
+    var data = this._cacheMem;
+    // END EDIT
+
     var todos = data.todos;
-    var todoId;
+
+    // START EDIT
+    // EDIT: Eliminate unnecessary varible
+    // var todoId;
+
+    // END EDIT
 
     for (var i = 0; i < todos.length; i++) {
       if (todos[i].id == id) {
-        todoId = todos[i].id;
-      }
-    }
+        // START EDIT
+        // EDIT: Eliminate unnecessary varible
+        // todoId = todos[i].id;
 
-    for (var i = 0; i < todos.length; i++) {
-      if (todos[i].id == todoId) {
+        // END EDIT
+
         todos.splice(i, 1);
       }
     }
+
+    // START EDIT
+    // EDIT: This code block is unnecessary since
+    // the splice is in the above for loop
+    // for (var i = 0; i < todos.length; i++) {
+    //   if (todos[i].id == todoId) {
+    //     todos.splice(i, 1);
+    //   }
+    // }
+
+    // END EDIT
 
     localStorage[this._dbName] = JSON.stringify(data);
     callback.call(this, todos);
@@ -148,9 +223,16 @@
    * @param {function} callback The callback to fire after dropping the data
    */
   Store.prototype.drop = function (callback) {
-    var data = { todos: [] };
-    localStorage[this._dbName] = JSON.stringify(data);
+    // START EDIT
+    // EDIT: Use cache object instead
+    // var data = { todos: [] };
+    // localStorage[this._dbName] = JSON.stringify(data);
+
+    this._cacheMem = { todo: [] };
+    localStorage[this._dbName] = JSON.stringify(this._cacheMem);
+
     callback.call(this, data.todos);
+    // END EDIT
   };
 
   // Export to window
