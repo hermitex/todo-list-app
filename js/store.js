@@ -140,15 +140,27 @@
       callback.call(this, todos);
     } else {
       // START EDIT
-      // EDIT: Let us use a timestamp to generate the ID.
-      // This could be more unique
       // Assign an ID
       // Generate an ID
       var newId = '';
       var charset = '0123456789';
 
-      for (var i = 0; i < 6; i++) {
-        newId += charset.charAt(Math.floor(Math.random() * charset.length));
+      // for (var i = 0; i < 6; i++) {
+      //   newId += charset.charAt(Math.floor(Math.random() * charset.length));
+      // }
+
+      var isUniqueId = true;
+
+      while (isUniqueId) {
+        for (var i = 0; i < 6; i++) {
+          newId += charset.charAt(Math.floor(Math.random() * charset.length));
+        }
+        isUniqueId = false;
+        for (var i = 0; i < todos.length; i++) {
+          if (todos[i].id == newId) {
+            isUniqueId = true;
+          }
+        }
       }
 
       // END EDIT
